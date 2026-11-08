@@ -29,7 +29,8 @@ body.modal-open{overflow:hidden}
 .reg.sel,.reg.sel:hover{fill:var(--mint)!important;filter:drop-shadow(0 0 16px rgba(120,235,183,0.95));transform:scale(1.02)}
 .prov{opacity:0;animation:provIn .5s var(--spring) forwards}
 .prov.sel{fill:var(--mint)!important;filter:drop-shadow(0 0 14px rgba(120,235,183,0.95))}
-.badge{pointer-events:none;opacity:0;animation:popIn .4s var(--spring) forwards}
+.badge-pos{pointer-events:none}
+.badge{pointer-events:none;opacity:0;transform-box:fill-box;transform-origin:center;animation:popIn .4s var(--spring) forwards}
 .badge circle{fill:var(--dark);stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke}
 .badge text{fill:#fff;font:700 11px Figtree,sans-serif;text-anchor:middle;dominant-baseline:central}
 @keyframes fadeIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
@@ -241,9 +242,10 @@ body.admin #inboxBtn{display:grid;animation:popIn .4s var(--spring)}
 <div id="tip"></div><div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
-const CFG={url:"https://umgtnalfygbuqunojdyf.supabase.co/",anon:"sb_publishable_TIqLOioWuaLM4iv_ge_ljQ_YwkYlI_Z",
+// Values are injected at build time from .env (see .env.example). Only PUBLIC keys belong here.
+const CFG={url:"%VITE_SUPABASE_URL%",anon:"%VITE_SUPABASE_PUBLISHABLE_KEY%",
   // Google Maps browser key with "Places API (New)" enabled; leave empty to type addresses by hand
-  mapsKey:"AIzaSyBGSoBFtXNKJ1P5KAvCfeVrKwLYNXn5_Tk"};
+  mapsKey:"%VITE_GOOGLE_MAPS_KEY%"};
 const GEO="https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson";
 const GEO_PROV="https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson";
 // people: location_id -> [rows], location_id = "province:<name>"
@@ -337,15 +339,20 @@ function regCount(){
   return c;
 }
 let regPath;
+// count badge: the outer group holds the position (SVG transform attribute), the inner
+// one runs the CSS pop-in. A CSS transform on the same element would override the
+// position and, in some browsers, throw the badge to the corner of the map.
+function badgeEnter(enter){
+  const g=enter.append("g").attr("class","badge-pos").append("g").attr("class","badge");
+  g.append("circle").attr("r",11);g.append("text");return g.select(function(){return this.parentNode});
+}
 function paintRegions(){
   if(!regPath||!provGeo)return;
   const c=regCount(),svg=d3.select("#map");
   const data=svg.selectAll(".reg").data().filter(d=>c[d.properties.reg_istat_code]);
-  svg.select(".badges").selectAll("g").data(data,d=>d.properties.reg_istat_code).join(enter=>{
-    const g=enter.append("g").attr("class","badge");
-    g.append("circle").attr("r",11);g.append("text");return g;
-  }).attr("transform",d=>{const[x,y]=regPath.centroid(d);return`translate(${x},${y})`})
-    .style("animation-delay",(d,i)=>i*60+"ms")
+  svg.select(".badges").selectAll(".badge-pos").data(data,d=>d.properties.reg_istat_code).join(badgeEnter)
+    .attr("transform",d=>{const[x,y]=regPath.centroid(d);return`translate(${x},${y})`})
+    .select(".badge").style("animation-delay",(d,i)=>i*60+"ms")
     .select("text").text(d=>c[d.properties.reg_istat_code]);
 }
 
@@ -391,11 +398,9 @@ function paintProvinces(path){
   const svg=d3.select("#pmap");
   svg.selectAll(".prov").attr("fill",d=>prosOf(d.properties.prov_name).length?region.color:tint);
   const data=svg.selectAll(".prov").data().filter(d=>prosOf(d.properties.prov_name).length);
-  svg.select(".badges").selectAll("g").data(data,d=>d.properties.prov_name).join(enter=>{
-    const g=enter.append("g").attr("class","badge");
-    g.append("circle").attr("r",11);g.append("text");return g;
-  }).attr("transform",d=>{const[x,y]=path.centroid(d);return`translate(${x},${y})`})
-    .style("animation-delay",(d,i)=>300+i*60+"ms")
+  svg.select(".badges").selectAll(".badge-pos").data(data,d=>d.properties.prov_name).join(badgeEnter)
+    .attr("transform",d=>{const[x,y]=path.centroid(d);return`translate(${x},${y})`})
+    .select(".badge").style("animation-delay",(d,i)=>300+i*60+"ms")
     .select("text").text(d=>prosOf(d.properties.prov_name).length);
   paintRegions();
 }
