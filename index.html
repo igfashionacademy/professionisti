@@ -44,13 +44,13 @@ body.modal-open{overflow:hidden}
 /* region popup */
 #modal{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:rgba(27,27,27,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
 #modal.on{opacity:1;pointer-events:auto}
-.sheet{position:relative;width:min(760px,100%);height:min(88vh,820px);background:var(--blush);border-radius:24px;border:2px solid rgba(255,255,255,0.8);box-shadow:0 24px 60px rgba(0,0,0,0.18);overflow:hidden;overflow:clip;transform:translateY(24px) scale(.96);transition:transform .45s var(--spring)}
+.sheet{position:relative;width:min(760px,100%);height:min(88vh,820px);height:min(88dvh,820px);background:var(--blush);border-radius:24px;border:2px solid rgba(255,255,255,0.8);box-shadow:0 24px 60px rgba(0,0,0,0.18);overflow:hidden;overflow:clip;transform:translateY(24px) scale(.96);transition:transform .45s var(--spring)}
 #modal.on .sheet{transform:none}
 .view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--blush);transition:transform .45s var(--ease), opacity .45s var(--ease), filter .45s var(--ease)}
 .vhead{display:flex;align-items:center;gap:12px;padding:20px 24px 12px;flex:none}
 .vhead h2{margin:0;font-size:22px;line-height:1.2;flex:1;min-width:0}
 .vhead small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#777}
-.vbody{flex:1;overflow:auto;padding:4px 24px 24px}
+.vbody{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 24px 48px}
 .icon-btn{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#000;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform .25s var(--spring), background .2s ease, box-shadow .2s ease}
 .icon-btn:hover{transform:scale(1.1);box-shadow:0 6px 14px rgba(0,0,0,0.12)}
 .icon-btn.back:hover{transform:translateX(-3px) scale(1.08)}
@@ -71,7 +71,7 @@ body.modal-open{overflow:hidden}
 .pro h3{margin:0;font-size:20px}
 .riep{border:1px solid;border-radius:14px;padding:12px 16px;margin:0 0 14px}
 .riep p{margin:0}
-.riep.hint{margin-top:16px}
+.riep.cta{margin-top:16px}
 .vbadge{display:inline-grid;place-items:center;vertical-align:-3px;margin-left:6px;color:#1d9bf0;cursor:help;transition:transform .25s var(--spring)}
 .vbadge:hover{transform:scale(1.15)}
 .pro p{margin:0 0 14px;line-height:1.6;color:#222}
@@ -82,7 +82,7 @@ article.pro .ph{cursor:zoom-in}
 /* enlarged profile photo: click anywhere (or Esc) to close */
 #zoom{position:fixed;inset:0;z-index:35;display:grid;place-items:center;padding:16px;background:rgba(27,27,27,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;cursor:zoom-out;transition:opacity .3s var(--ease)}
 #zoom.on{opacity:1;pointer-events:auto}
-#zoom img{max-width:min(92vw,720px);max-height:86vh;object-fit:contain;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.4);transform:scale(.85);transition:transform .35s var(--spring)}
+#zoom img{max-width:min(92vw,720px);max-height:86vh;max-height:86dvh;object-fit:contain;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.4);transform:scale(.85);transition:transform .35s var(--spring)}
 #zoom.on img{transform:scale(1)}
 .ph:hover{transform:scale(1.04);box-shadow:0 8px 20px rgba(0,0,0,0.15)}
 .empty{text-align:center;color:#666;padding:40px 10px;animation:slideUp .45s var(--ease) both}
@@ -221,7 +221,7 @@ body.admin #inboxBtn{display:grid;animation:popIn .4s var(--spring)}
 .lg button:hover{transform:scale(1.05);background:#333}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.25);transition:all .3s var(--ease);z-index:40}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-@media(max-width:600px){.banner{flex-direction:column;align-items:flex-start}.vhead{padding:16px 16px 10px}.vbody{padding:4px 16px 16px}.sheet{height:92vh}}
+@media(max-width:600px){.banner{flex-direction:column;align-items:flex-start}.vhead{padding:16px 16px 10px}.vbody{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}.sheet{height:92vh;height:92dvh}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.prov,.badge{opacity:1}}
 </style></head><body>
 <button id="lock" aria-label="Amministratore"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></button>
@@ -474,7 +474,7 @@ function proCard(p,i){
     ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>${rich(p.summary)}</p></div>`:""}
     ${p.description?`<p>${rich(p.description)}</p>`:""}
     ${sv.length?`<h4>Servizi</h4><ul>${sv.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
-    ${so.length?`<div class="riep hint" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>Non sai da dove iniziare? Contatta <b>${esc(p.name)}</b> come preferisci: ti aiuterà a scegliere il percorso più adatto a te.</p></div>`:""}
+    ${so.length?`<div class="riep cta" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>Non sai da dove iniziare? Contatta <b>${esc(p.name)}</b> come preferisci: ti aiuterà a scegliere il percorso più adatto a te.</p></div>`:""}
     ${so.length?`<h4>Contatti</h4><ul>${so.map(s=>contactLine(s,c)).join("")}</ul>`:""}
     ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
   </article>`);
@@ -514,8 +514,8 @@ function reviewsBlock(p){
       <label>La tua valutazione <span class="opt">(facoltativa)</span></label>
       <div class="pick" role="radiogroup" aria-label="Valutazione">${[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="false" aria-label="${i} stell${i>1?"e":"a"}"><svg viewBox="0 0 24 24" width="28" height="28"><path d="${starPath}"/></svg></button>`).join("")}</div>
       <input type="hidden" name="rating">
-      <label>Nome Cognome e Città</label><input name="author" required maxlength="60" autocomplete="off" placeholder="Es. Maria Rossi, Torino">
-      <label>Racconta la tua esperienza con il Professionista</label><textarea name="body" required maxlength="1000"></textarea>
+      <label>Nome Cognome e Città</label><input name="author" required maxlength="100" autocomplete="off" placeholder="Es. Maria Rossi, Torino">
+      <label>Racconta la tua esperienza con il Professionista</label><textarea name="body" required maxlength="3000"></textarea>
       <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="actions"><button type="button" class="btn ghost cancel">Annulla</button><button class="btn primary">Invia</button></div>
     </form></div></div>
@@ -563,10 +563,10 @@ function proForm(p,i){
   const f=el(`<form class="pro">
     <div class="num"><span>Professionista ${i+1}</span>${p?"":`<span style="color:#1f9d68">Nuovo</span>`}</div>
     <label>Nome</label><input name="name" required maxlength="100" value="${esc(p?.name)}">
-    <label>Riepilogo</label><textarea name="summary" maxlength="500" placeholder="Una o due frasi in evidenza">${esc(p?.summary)}</textarea>
-    <label>Descrizione</label><textarea name="description" maxlength="2000">${esc(p?.description)}</textarea>
-    <label>Servizi (uno per riga)</label><textarea name="services" maxlength="1000" placeholder="Es. Consulenza, visite a domicilio">${esc(p?.services)}</textarea>
-    <label>Contatti (uno per riga)</label><textarea name="socials" maxlength="1000" placeholder="Telefono, email, sito o social">${esc(p?.socials)}</textarea>
+    <label>Riepilogo</label><textarea name="summary" maxlength="1500" placeholder="Una o due frasi in evidenza">${esc(p?.summary)}</textarea>
+    <label>Descrizione</label><textarea name="description" maxlength="8000">${esc(p?.description)}</textarea>
+    <label>Servizi (uno per riga)</label><textarea name="services" maxlength="3000" placeholder="Es. Consulenza, visite a domicilio">${esc(p?.services)}</textarea>
+    <label>Contatti (uno per riga)</label><textarea name="socials" maxlength="2000" placeholder="Telefono, email, sito o social">${esc(p?.socials)}</textarea>
     <label>Indirizzo</label><div class="ac"><input name="phone" maxlength="200" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Via, numero civico, città" value="${esc(p?.phone)}">
       <div class="ac-list"><div class="ac-items" role="listbox"></div><div class="ac-foot">powered by Google</div></div></div>
     <label>Foto</label>
