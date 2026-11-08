@@ -69,6 +69,11 @@ body.modal-open{overflow:hidden}
 .pro.out{opacity:0;transform:translateX(30px);max-height:0!important;margin:0;padding-top:0;padding-bottom:0;overflow:hidden}
 .pro .top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
 .pro h3{margin:0;font-size:20px}
+.riep{border:1px solid;border-radius:14px;padding:12px 16px;margin:0 0 14px}
+.riep h4{margin:0 0 4px!important}
+.riep p{margin:0}
+.vbadge{display:inline-grid;place-items:center;vertical-align:-3px;margin-left:6px;color:#1d9bf0;cursor:help;transition:transform .25s var(--spring)}
+.vbadge:hover{transform:scale(1.15)}
 .pro p{margin:0 0 14px;line-height:1.6;color:#222}
 .pro h4{margin:0 0 6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
 .pro .num{font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#999;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
@@ -439,20 +444,30 @@ function renderProvince(){
 }
 // the "phone" column holds the address and "socials" holds the contact lines
 const contactHref=s=>/^https?:\/\//.test(s)?s:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)?"mailto:"+s:/^\+?[\d\s().-]{6,}$/.test(s)?"tel:"+s.replace(/[^\d+]/g,""):/^www\./.test(s)?"https://"+s:"";
-// a contact line is either a bare value or "Label: value" (e.g. "Instagram: https://...")
+// a contact line is either a bare value or "Label: value"; with a label, the label itself becomes the link
 function contactLine(s,c){
   const a=(h,t)=>`<a href="${esc(h)}"${/^https?:/.test(h)?' target="_blank" rel="noopener"':""} style="color:${c};font-weight:500">${esc(t)}</a>`;
   let h=contactHref(s);if(h)return `<li>${a(h,s)}</li>`;
   const m=s.match(/^([^:]{1,40}):\s+(.+)$/);
-  if(m&&(h=contactHref(m[2])))return `<li>${esc(m[1])}: ${a(h,m[2])}</li>`;
+  if(m&&(h=contactHref(m[2])))return `<li>${a(h,m[1].trim())}</li>`; // "Instagram: url" -> "Instagram" as the link
   return `<li>${esc(s)}</li>`;
 }
+// verified badge next to every professional's name, except the academy's founder
+const VERIFIED_TEXT="Professionista Certificato Igfashion Academy dal 2026";
+const isVerified=n=>String(n||"").trim().replace(/\s+/g," ").toLowerCase()!=="irina ghertu";
+const verifiedBadge=`<span class="vbadge" tabindex="0" role="img" aria-label="${VERIFIED_TEXT}"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 1.5l2.6 1.9 3.2-.1 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.1L12 22.5l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.1z"/><path d="M8 12.2l2.7 2.7L16.2 9.4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+// hover shows the certification text; on touch screens a tap shows it for a moment
+document.addEventListener("mouseover",e=>{const b=e.target.closest?.(".vbadge");if(b&&!b.contains(e.relatedTarget))tip(e,VERIFIED_TEXT)});
+document.addEventListener("mousemove",e=>{if(e.target.closest?.(".vbadge"))tip(e)});
+document.addEventListener("mouseout",e=>{const b=e.target.closest?.(".vbadge");if(b&&!b.contains(e.relatedTarget))hideTip()});
+document.addEventListener("click",e=>{if(!e.target.closest(".vbadge"))return;tip(e,VERIFIED_TEXT);clearTimeout(tip.t);tip.t=setTimeout(hideTip,2500)});
 function el(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild}
 function proCard(p,i){
   const c=deep(region.color),so=(p.socials||"").split("\n").map(s=>s.trim()).filter(Boolean),sv=(p.services||"").split("\n").map(s=>s.trim()).filter(Boolean);
   const e=el(`<article class="pro">
     <div class="top">${p.photo_url?`<img class="ph" src="${esc(p.photo_url)}" alt="" style="border:3px solid ${region.color}">`:""}
-      <h3>${esc(p.name)}</h3></div>
+      <h3>${esc(p.name)}${isVerified(p.name)?verifiedBadge:""}</h3></div>
+    ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><h4 style="color:${c}">Riepilogo</h4><p>${rich(p.summary)}</p></div>`:""}
     ${p.description?`<p>${rich(p.description)}</p>`:""}
     ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
     ${sv.length?`<h4>Servizi</h4><ul>${sv.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
@@ -494,8 +509,8 @@ function reviewsBlock(p){
       <label>La tua valutazione <span class="opt">(facoltativa)</span></label>
       <div class="pick" role="radiogroup" aria-label="Valutazione">${[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="false" aria-label="${i} stell${i>1?"e":"a"}"><svg viewBox="0 0 24 24" width="28" height="28"><path d="${starPath}"/></svg></button>`).join("")}</div>
       <input type="hidden" name="rating">
-      <label>Nome</label><input name="author" required maxlength="60" autocomplete="name">
-      <label>Commento</label><textarea name="body" required maxlength="1000" placeholder="Racconta la tua esperienza"></textarea>
+      <label>Nome Cognome e Città</label><input name="author" required maxlength="60" autocomplete="off" placeholder="Es. Maria Rossi, Torino">
+      <label>Racconta la tua esperienza con il Professionista</label><textarea name="body" required maxlength="1000"></textarea>
       <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="actions"><button type="button" class="btn ghost cancel">Annulla</button><button class="btn primary">Invia</button></div>
     </form></div></div>
@@ -506,7 +521,7 @@ function reviewsBlock(p){
     w.querySelector(".rv-avg").innerHTML=rs.length?`${rated.length?`${stars(avg)} <b>${avg.toFixed(1).replace(".",",")}</b>`:""}<span>${rs.length} comment${rs.length>1?"i":"o"}</span>`:"";
     const list=w.querySelector(".rv-list");
     list.innerHTML=rs.length?(all?rs:rs.slice(0,3)).map((r,i)=>reviewItem(r,i,r.id===fresh)).join("")+(rs.length>3&&!all?`<button type="button" class="more">Mostra tutti (${rs.length})</button>`:"")
-      :`<p class="rv-none">Ancora nessun commento. Scrivi il primo!</p>`;
+      :`<p class="rv-none">Hai studiato con ${esc(p.name)}? Raccontaci com'è andata...</p>`;
     list.querySelector(".more")?.addEventListener("click",()=>{all=true;paint()});
     scoreSummary(w.querySelector(".rv-score"),rated,avg);
   };
@@ -543,6 +558,7 @@ function proForm(p,i){
   const f=el(`<form class="pro">
     <div class="num"><span>Professionista ${i+1}</span>${p?"":`<span style="color:#1f9d68">Nuovo</span>`}</div>
     <label>Nome</label><input name="name" required maxlength="100" value="${esc(p?.name)}">
+    <label>Riepilogo</label><textarea name="summary" maxlength="500" placeholder="Una o due frasi in evidenza">${esc(p?.summary)}</textarea>
     <label>Descrizione</label><textarea name="description" maxlength="2000">${esc(p?.description)}</textarea>
     <label>Indirizzo</label><div class="ac"><input name="phone" maxlength="200" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Via, numero civico, città" value="${esc(p?.phone)}">
       <div class="ac-list"><div class="ac-items" role="listbox"></div><div class="ac-foot">powered by Google</div></div></div>
