@@ -242,10 +242,10 @@ body.admin #inboxBtn{display:grid;animation:popIn .4s var(--spring)}
 <div id="tip"></div><div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
-// Values are injected at build time from .env (see .env.example). Only PUBLIC keys belong here.
-const CFG={url:"%VITE_SUPABASE_URL%",anon:"%VITE_SUPABASE_PUBLISHABLE_KEY%",
+// Supabase project "IGFA". Only PUBLIC keys belong here (never the service_role key).
+const CFG={url:"https://umgtnalfygbuqunojdyf.supabase.co",anon:"sb_publishable_TIqLOioWuaLM4iv_ge_ljQ_YwkYlI_Z",
   // Google Maps browser key with "Places API (New)" enabled; leave empty to type addresses by hand
-  mapsKey:"%VITE_GOOGLE_MAPS_KEY%"};
+  mapsKey:""};
 const GEO="https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson";
 const GEO_PROV="https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson";
 // people: location_id -> [rows], location_id = "province:<name>"
