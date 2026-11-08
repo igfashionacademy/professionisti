@@ -30,6 +30,9 @@ body.modal-open{overflow:hidden}
 .prov{opacity:0;animation:provIn .5s var(--spring) forwards}
 .prov.sel{fill:var(--mint)!important;filter:drop-shadow(0 0 14px rgba(120,235,183,0.95))}
 .badge-pos{pointer-events:none}
+.plabels{pointer-events:none}
+.plabel{fill:var(--dark);stroke:var(--cream);stroke-width:3px;stroke-linejoin:round;paint-order:stroke;font:700 12px Figtree,sans-serif;text-anchor:middle;dominant-baseline:central;opacity:0;animation:labelIn .5s var(--ease) forwards}
+@keyframes labelIn{to{opacity:1}}
 .badge{pointer-events:none;opacity:0;transform-box:fill-box;transform-origin:center;animation:popIn .4s var(--spring) forwards}
 .badge circle{fill:var(--dark);stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke}
 .badge text{fill:#fff;font:700 11px Figtree,sans-serif;text-anchor:middle;dominant-baseline:central}
@@ -399,6 +402,10 @@ function drawProvinces(){
     .on("mouseenter",function(e,d){toTop(this);const n=prosOf(d.properties.prov_name).length;tip(e,d.properties.prov_name+(n?` · ${n} professionist${n>1?"i":"a"}`:""))})
     .on("mousemove",e=>tip(e)).on("mouseleave",hideTip)
     .on("pointerup",function(e,d){if(e.button===0)openProvince(this,d.properties)});
+  svg.append("g").attr("class","plabels").selectAll("text").data(feats).join("text")
+    .attr("class","plabel").attr("x",d=>path.centroid(d)[0])
+    .style("animation-delay",(d,i)=>200+i*60+"ms")
+    .text(d=>d.properties.prov_name);
   svg.append("g").attr("class","badges");
   paintProvinces(path);
 }
@@ -413,6 +420,8 @@ function paintProvinces(path){
     .attr("transform",d=>{const[x,y]=path.centroid(d);return`translate(${x},${y})`})
     .select(".badge").style("animation-delay",(d,i)=>300+i*60+"ms")
     .select("text").text(d=>prosOf(d.properties.prov_name).length);
+  // push the name below the count badge when a province has one
+  svg.selectAll(".plabel").attr("y",d=>path.centroid(d)[1]+(prosOf(d.properties.prov_name).length?20:0));
   paintRegions();
 }
 
