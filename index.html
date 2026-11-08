@@ -442,7 +442,11 @@ function renderProvince(){
   }
 }
 // the "phone" column holds the address and "socials" holds the contact lines
-const contactHref=s=>/^https?:\/\//.test(s)?s:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)?"mailto:"+s:/^\+?[\d\s().-]{6,}$/.test(s)?"sms:"+s.replace(/[^\d+]/g,""):/^www\./.test(s)?"https://"+s:"";
+// phone numbers open a WhatsApp chat; numbers without a country code are taken as Italian (+39)
+const waLink=s=>{const t=s.trim();let d=t.replace(/\D/g,"");
+  if(!t.startsWith("+")&&!d.startsWith("00"))d="39"+d;else if(d.startsWith("00"))d=d.slice(2);
+  return "https://wa.me/"+d};
+const contactHref=s=>/^https?:\/\//.test(s)?s:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)?"mailto:"+s:/^\+?[\d\s().-]{6,}$/.test(s)?waLink(s):/^www\./.test(s)?"https://"+s:"";
 // a contact line is either a bare value or "Label: value"; with a label, the label itself becomes the link
 function contactLine(s,c){
   const a=(h,t)=>`<a href="${esc(h)}"${/^https?:/.test(h)?' target="_blank" rel="noopener"':""} style="color:${c};font-weight:500">${esc(t)}</a>`;
