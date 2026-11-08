@@ -472,9 +472,9 @@ function proCard(p,i){
       <h3>${esc(p.name)}${isVerified(p.name)?verifiedBadge:""}</h3></div>
     ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>${rich(p.summary)}</p></div>`:""}
     ${p.description?`<p>${rich(p.description)}</p>`:""}
-    ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
     ${sv.length?`<h4>Servizi</h4><ul>${sv.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
     ${so.length?`<h4>Contatti</h4><ul>${so.map(s=>contactLine(s,c)).join("")}</ul>`:""}
+    ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
   </article>`);
   if(p.id)e.append(reviewsBlock(p));
   e.style.animationDelay=i*80+"ms";return e;
@@ -563,10 +563,10 @@ function proForm(p,i){
     <label>Nome</label><input name="name" required maxlength="100" value="${esc(p?.name)}">
     <label>Riepilogo</label><textarea name="summary" maxlength="500" placeholder="Una o due frasi in evidenza">${esc(p?.summary)}</textarea>
     <label>Descrizione</label><textarea name="description" maxlength="2000">${esc(p?.description)}</textarea>
-    <label>Indirizzo</label><div class="ac"><input name="phone" maxlength="200" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Via, numero civico, città" value="${esc(p?.phone)}">
-      <div class="ac-list"><div class="ac-items" role="listbox"></div><div class="ac-foot">powered by Google</div></div></div>
     <label>Servizi (uno per riga)</label><textarea name="services" maxlength="1000" placeholder="Es. Consulenza, visite a domicilio">${esc(p?.services)}</textarea>
     <label>Contatti (uno per riga)</label><textarea name="socials" maxlength="1000" placeholder="Telefono, email, sito o social">${esc(p?.socials)}</textarea>
+    <label>Indirizzo</label><div class="ac"><input name="phone" maxlength="200" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Via, numero civico, città" value="${esc(p?.phone)}">
+      <div class="ac-list"><div class="ac-items" role="listbox"></div><div class="ac-foot">powered by Google</div></div></div>
     <label>Foto</label>
     <div class="drop-file">
       <div class="thumb">${p?.photo_url?`<img src="${esc(p.photo_url)}" alt="">`:camIcon}</div>
