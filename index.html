@@ -442,7 +442,7 @@ function renderProvince(){
   }
 }
 // the "phone" column holds the address and "socials" holds the contact lines
-const contactHref=s=>/^https?:\/\//.test(s)?s:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)?"mailto:"+s:/^\+?[\d\s().-]{6,}$/.test(s)?"tel:"+s.replace(/[^\d+]/g,""):/^www\./.test(s)?"https://"+s:"";
+const contactHref=s=>/^https?:\/\//.test(s)?s:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)?"mailto:"+s:/^\+?[\d\s().-]{6,}$/.test(s)?"sms:"+s.replace(/[^\d+]/g,""):/^www\./.test(s)?"https://"+s:"";
 // a contact line is either a bare value or "Label: value"; with a label, the label itself becomes the link
 function contactLine(s,c){
   const a=(h,t)=>`<a href="${esc(h)}"${/^https?:/.test(h)?' target="_blank" rel="noopener"':""} style="color:${c};font-weight:500">${esc(t)}</a>`;
