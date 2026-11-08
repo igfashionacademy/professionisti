@@ -70,7 +70,6 @@ body.modal-open{overflow:hidden}
 .pro .top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
 .pro h3{margin:0;font-size:20px}
 .riep{border:1px solid;border-radius:14px;padding:12px 16px;margin:0 0 14px}
-.riep h4{margin:0 0 4px!important}
 .riep p{margin:0}
 .vbadge{display:inline-grid;place-items:center;vertical-align:-3px;margin-left:6px;color:#1d9bf0;cursor:help;transition:transform .25s var(--spring)}
 .vbadge:hover{transform:scale(1.15)}
@@ -467,7 +466,7 @@ function proCard(p,i){
   const e=el(`<article class="pro">
     <div class="top">${p.photo_url?`<img class="ph" src="${esc(p.photo_url)}" alt="" style="border:3px solid ${region.color}">`:""}
       <h3>${esc(p.name)}${isVerified(p.name)?verifiedBadge:""}</h3></div>
-    ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><h4 style="color:${c}">Riepilogo</h4><p>${rich(p.summary)}</p></div>`:""}
+    ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>${rich(p.summary)}</p></div>`:""}
     ${p.description?`<p>${rich(p.description)}</p>`:""}
     ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
     ${sv.length?`<h4>Servizi</h4><ul>${sv.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
