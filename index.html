@@ -474,7 +474,7 @@ function proCard(p,i){
     ${p.summary?`<div class="riep" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>${rich(p.summary)}</p></div>`:""}
     ${p.description?`<p>${rich(p.description)}</p>`:""}
     ${sv.length?`<h4>Servizi</h4><ul>${sv.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
-    ${so.length?`<div class="riep cta" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>Non sai da dove iniziare? Contatta <b>${esc(p.name)}</b> come preferisci: ti aiuterà a scegliere il percorso più adatto a te.</p></div>`:""}
+    ${so.length?`<div class="riep cta" style="background:${d3.interpolateRgb(region.color,"#fff")(0.72)};border-color:${d3.interpolateRgb(region.color,"#fff")(0.45)}"><p>Non sai da dove iniziare? Scrivimi dove ti è più comodo: insieme troveremo il percorso giusto per te.</p></div>`:""}
     ${so.length?`<h4>Contatti</h4><ul>${so.map(s=>contactLine(s,c)).join("")}</ul>`:""}
     ${p.phone?`<h4>Indirizzo</h4><p><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.phone)}" target="_blank" rel="noopener" style="font-weight:600;color:${c};text-decoration:none">${esc(p.phone)}</a></p>`:""}
   </article>`);
