@@ -226,6 +226,15 @@ body.admin #inboxBtn{display:grid;animation:popIn .4s var(--spring)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:600px){.banner{flex-direction:column;align-items:flex-start}.vhead{padding:16px 16px 10px}.vbody{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}.sheet{height:92vh;height:92dvh}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.prov,.badge{opacity:1}}
+/* ===== EASTER EGG: type "Brain Power" in the login box → disco + DVD mode ===== */
+html.brainpower{animation:bp-hue 2s linear infinite}
+html.brainpower body::after{content:"";position:fixed;inset:-50%;z-index:9999;pointer-events:none;mix-blend-mode:overlay;
+  background:conic-gradient(red,orange,yellow,lime,cyan,blue,magenta,red);animation:bp-spin 3s linear infinite,bp-flash .353s steps(2) infinite}
+html.brainpower :is(button,h1,h2,p,img,article){animation:bp-bounce .353s ease-in-out infinite alternate} /* .353s = one beat at 170 BPM */
+@keyframes bp-hue{to{filter:hue-rotate(360deg) saturate(1.6)}}
+@keyframes bp-spin{to{rotate:360deg}}
+@keyframes bp-flash{50%{opacity:.25}}
+@keyframes bp-bounce{to{scale:1.12}}
 </style></head><body>
 <button id="lock" aria-label="Amministratore"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></button>
 <header class="banner"><img src="mam1.jpg" alt="">
@@ -726,7 +735,43 @@ $("#lock").onclick=()=>{
   if(admin){admin=false;pass="";store.del("ap");document.body.classList.remove("admin");toast("Modalità admin disattivata");closeInbox();if(prov)renderProvince();return}
   openLogin();
 };
-$("#login").onsubmit=e=>{e.preventDefault();const i=$("#login input");tryPass(i.value);i.value=""};
+$("#login").onsubmit=e=>{
+  e.preventDefault();const i=$("#login input");
+  // EASTER EGG: "Brain Power" never reaches the server, it toggles disco mode instead
+  if(i.value.trim().toLowerCase()==="brain power"){i.value="";closeLogin();return brainPower()}
+  tryPass(i.value);i.value=""};
+
+/* ===== EASTER EGG: BRAIN POWER =====
+   Music: put brainpower.mp3 next to index.html (build copies it into dist/; not in git, it is copyrighted).
+   Disco/rainbow/bounce live in the CSS under html.brainpower; DVD mode is below:
+   every UI block drifts around the screen and changes colour when it hits an edge. */
+const BP_START=88; // start (and loop back) at 1:28
+const bpSong=new Audio("brainpower.mp3");bpSong.onended=()=>{bpSong.currentTime=BP_START;bpSong.play()};
+let bpRaf=0,bpBoxes=[];
+function brainPower(){
+  const on=document.documentElement.classList.toggle("brainpower");
+  cancelAnimationFrame(bpRaf);
+  bpBoxes.forEach(b=>{b.el.style.translate=b.el.style.filter=""});
+  if(!on){bpSong.pause();return toast("Brain Power off")}
+  bpSong.currentTime=BP_START;bpSong.play().catch(()=>toast("Metti brainpower.mp3 accanto a index.html"));
+  toast("O-oooooooooo AAAAE-A-A-I-A-U-");
+  bpBoxes=[...document.querySelectorAll("#lock,#inboxBtn,.banner img,.banner h1,.banner p,.stage")]
+    .filter(el=>el.offsetWidth)
+    .map(el=>({el,r:el.getBoundingClientRect(),x:0,y:0,vx:(Math.random()<.5?-1:1)*(2+Math.random()*3),vy:(Math.random()<.5?-1:1)*(2+Math.random()*3)}));
+  const step=()=>{
+    for(const b of bpBoxes){
+      b.x+=b.vx;b.y+=b.vy;
+      const L=b.r.left+b.x,T=b.r.top+b.y,W=innerWidth-b.r.width,H=innerHeight-b.r.height; // oversized blocks (the map) bounce in the negative range instead
+      let hit=false;
+      if(L<Math.min(0,W)&&b.vx<0||L>Math.max(0,W)&&b.vx>0){b.vx*=-1;hit=true}
+      if(T<Math.min(0,H)&&b.vy<0||T>Math.max(0,H)&&b.vy>0){b.vy*=-1;hit=true}
+      if(hit)b.el.style.filter=`hue-rotate(${Math.random()*360|0}deg) saturate(3)`;
+      b.el.style.translate=`${b.x}px ${b.y}px`;
+    }
+    bpRaf=requestAnimationFrame(step);
+  };
+  step();
+}
 $("#login").onclick=e=>{if(e.target.id==="login")closeLogin()};
 $("#close").onclick=closeRegion;
 $("#back").onclick=backToRegion;

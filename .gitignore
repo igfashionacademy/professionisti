@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.local
+.env.local
+.env.*.local
+supabase/.temp/
+supabase/.branches/
+.env
+.claude/
+# copyrighted song: keep it local, copy it onto the server by hand
+brainpower.mp3

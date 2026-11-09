@@ -37,8 +37,8 @@ Deno.serve(async (req) => {
     if (recent.length >= 5) return j({ error: "Hai inviato troppi commenti, riprova più tardi" }, 429);
     if (s("website", 10)) return j({ ok: true }); // honeypot: only bots fill the hidden field
     const person_id = s("person_id", 40);
-    const author = s("author", 60).trim();
-    const body = s("body", 1000).trim();
+    const author = s("author", 100).trim();
+    const body = s("body", 3000).trim();
     const r = Number(s("rating", 1));
     const rating = r >= 1 && r <= 5 ? r : null;
     if (!/^[0-9a-f-]{36}$/i.test(person_id)) return j({ error: "Professionista non valido" }, 400);
@@ -88,10 +88,11 @@ Deno.serve(async (req) => {
     location_id,
     location_name: s("location_name", 120),
     name,
-    description: s("description", 2000),
+    summary: s("summary", 1500), // "Riepilogo", shown above the description
+    description: s("description", 8000),
     phone: s("phone", 200), // address
-    services: s("services", 1000), // services, one per line
-    socials: s("socials", 1000), // contacts, one per line
+    services: s("services", 3000), // services, one per line
+    socials: s("socials", 2000), // contacts, one per line
     updated_at: new Date().toISOString(),
   };
   const photo = fd.get("photo");

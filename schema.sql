@@ -5,6 +5,7 @@ create table public.people (
   location_id text not null,      -- e.g. "province:Torino"
   location_name text,
   name text not null,
+  summary text,                   -- shown as "Riepilogo" above the description
   description text,
   phone text,                     -- shown as "Indirizzo" (address)
   services text,                  -- shown as "Servizi", one per line
@@ -35,6 +36,9 @@ on conflict (id) do nothing;
 
 -- MIGRATION: add the "Servizi" column to an existing table
 -- alter table public.people add column if not exists services text;
+
+-- MIGRATION: add the "Riepilogo" column to an existing table
+-- alter table public.people add column if not exists summary text;
 
 -- Comments and reviews on professionals. Anyone can post one through the
 -- Edge Function (rate limited there); the admin resolves or deletes them.
