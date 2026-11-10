@@ -31,10 +31,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [{
-      // Brain Power easter egg: copy the song from the project root into dist/, next to index.html
-      name: "copy-brainpower",
+      // easter eggs: copy the songs from the project root into dist/, next to index.html
+      name: "copy-easter-egg-songs",
       closeBundle() {
-        if (fs.existsSync("brainpower.mp3")) fs.copyFileSync("brainpower.mp3", "dist/brainpower.mp3");
+        for (const f of ["brainpower.mp3", "christmas.mp3"]) if (fs.existsSync(f)) fs.copyFileSync(f, `dist/${f}`);
       },
     }],
     base: "./", // relative URLs: works in the web root or any subfolder on Aruba

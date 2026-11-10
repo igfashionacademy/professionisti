@@ -235,6 +235,10 @@ html.brainpower :is(button,h1,h2,p,img,article){animation:bp-bounce .353s ease-i
 @keyframes bp-spin{to{rotate:360deg}}
 @keyframes bp-flash{50%{opacity:.25}}
 @keyframes bp-bounce{to{scale:1.12}}
+/* ===== EASTER EGG: type "christmas" in the login box → song + snow ===== */
+#igf-xm{position:fixed;inset:0;width:100%;height:100%;z-index:9998;pointer-events:none;opacity:0;transition:opacity 1.5s ease;
+  background:linear-gradient(rgba(40,70,120,.22),rgba(40,70,120,.06))} /* blue winter tint so white flakes show on the cream page */
+#igf-xm.on{opacity:1}
 </style></head><body>
 <button id="lock" aria-label="Amministratore"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></button>
 <header class="banner"><img src="mam1.jpg" alt="">
@@ -739,6 +743,8 @@ $("#login").onsubmit=e=>{
   e.preventDefault();const i=$("#login input");
   // EASTER EGG: "Brain Power" never reaches the server, it toggles disco mode instead
   if(i.value.trim().toLowerCase()==="brain power"){i.value="";closeLogin();return brainPower()}
+  // EASTER EGG: "christmas" (also the typo "christmast") toggles song + snow
+  if(/^christmast?$/.test(i.value.trim().toLowerCase())){i.value="";closeLogin();return christmas()}
   tryPass(i.value);i.value=""};
 
 /* ===== EASTER EGG: BRAIN POWER =====
@@ -789,6 +795,41 @@ function brainPower(){
     bpRaf=requestAnimationFrame(step);
   };
   bpRaf=requestAnimationFrame(step);
+}
+/* ===== EASTER EGG: CHRISTMAS =====
+   Music: put christmas.mp3 next to index.html (build copies it into dist/; not in git, it is copyrighted).
+   Plays from 0:00 and loops, with a snow overlay that fades in/out. Type it again to stop. */
+const xmSong=new Audio("christmas.mp3");xmSong.loop=true;
+// snow is drawn on a canvas: no emoji font needed, same look in every browser
+const xmSnow=document.createElement("canvas");xmSnow.id="igf-xm";xmSnow.setAttribute("aria-hidden","true");
+document.body.append(xmSnow);
+const xmCtx=xmSnow.getContext("2d");
+let xmRaf=0,xmFlakes=[];
+function xmSize(){
+  const d=devicePixelRatio||1;xmSnow.width=innerWidth*d;xmSnow.height=innerHeight*d;
+  xmCtx.setTransform(d,0,0,d,0,0); // resizing a canvas resets its drawing state, so set it all again
+  xmCtx.fillStyle="#fff";xmCtx.shadowColor="rgba(60,90,140,.7)";xmCtx.shadowBlur=4;
+}
+addEventListener("resize",()=>{if(xmRaf)xmSize()});
+function xmDraw(){
+  xmCtx.clearRect(0,0,innerWidth,innerHeight);
+  for(const f of xmFlakes){
+    f.y+=f.v;f.x+=Math.sin(f.y/50+f.p)*.7;
+    if(f.y>innerHeight+10){f.y=-10;f.x=Math.random()*innerWidth}
+    xmCtx.beginPath();xmCtx.arc(f.x,f.y,f.r,0,Math.PI*2);xmCtx.fill();
+  }
+  xmRaf=requestAnimationFrame(xmDraw);
+}
+function christmas(){
+  const on=xmSnow.classList.toggle("on");
+  if(!on){xmSong.pause();setTimeout(()=>{if(!xmSnow.classList.contains("on")){cancelAnimationFrame(xmRaf);xmRaf=0}},1600);return toast("Natale off")} // stop drawing after the fade-out
+  if(!xmRaf){
+    xmSize();
+    xmFlakes=Array.from({length:140},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:1.5+Math.random()*3.5,v:.6+Math.random()*1.8,p:Math.random()*6}));
+    xmDraw();
+  }
+  xmSong.currentTime=0;xmSong.play().catch(()=>toast("Metti christmas.mp3 accanto a index.html"));
+  toast("🎄 All I want for Christmas is you 🎄");
 }
 $("#login").onclick=e=>{if(e.target.id==="login")closeLogin()};
 $("#close").onclick=closeRegion;
